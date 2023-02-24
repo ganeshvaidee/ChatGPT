@@ -12,15 +12,14 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 #-----------------------------------------------------------
 # setup voice engine for speaker
 #-----------------------------------------------------------
-english_engine = pyttsx3.init()
-voices = english_engine.getProperty('voices')
-english_engine.setProperty('voice', voices[0].id)  # you can change the index to select a different voice
-english_engine.setProperty('rate', 150)  # you can adjust the speaking rate (words per minute)
-
-tamil_engine = pyttsx3.init()
-voices = tamil_engine.getProperty('voices')
-tamil_engine.setProperty('voice', voices[1].id)  # you can change the index to select a different voice
-tamil_engine.setProperty('rate', 150)  # you can adjust the speaking rate (words per minute)
+voice_engine = pyttsx3.init()
+for voice in voice_engine.getProperty('voices'):
+  if 'English' in voice.name:
+    english_voice_id = voice.id
+  elif 'Tamil' in voice.name:
+    tamil_voice_id = voice.id
+  
+voice_engine.setProperty('rate', 150)
 
 #-----------------------------------------------------------
 # create a translator object
@@ -28,10 +27,9 @@ tamil_engine.setProperty('rate', 150)  # you can adjust the speaking rate (words
 translator = Translator()
 
 #-----------------------------------------------------------
-# Initialize the speech recognizer
+# Initialize the speech recognizer (mic)
 #-----------------------------------------------------------
 r = sr.Recognizer()
-
 
 #-----------------------------------------------------------
 # Get the speaker output (in Tamil)
@@ -95,13 +93,7 @@ def send_english_text_to_opanai(text):
 # Send english text to speaker
 #-----------------------------------------------------------
 def say_english_text(text):
-    # setup voice engine
-    english_engine = pyttsx3.init()
-
-    # set properties for the speaker
-    english_engine.setProperty('voice', voices[0].id)  # you can change the index to select a different voice
-    english_engine.setProperty('rate', 150)  # you can adjust the speaking rate (words per minute)
-
+    english_engine.setProperty('voice', english_voice_id)
     # send translation to speaker
     english_engine.say(text)
     english_engine.runAndWait()
@@ -110,12 +102,7 @@ def say_english_text(text):
 # Send Tamil text to speaker
 #-----------------------------------------------------------
 def say_tamil_text(text):
-    # setup voice engine
-    tamil_engine = pyttsx3.init()
-
-    tamil_engine.setProperty('voice', voices[1].id)  # you can change the index to select a different voice
-    tamil_engine.setProperty('rate', 150)  # you can adjust the speaking rate (words per minute)
-
+    tamil_engine.setProperty('voice', tamil_voice_id)
     # send translation to speaker
     tamil_engine.say(text)
     tamil_engine.runAndWait()
