@@ -6,7 +6,7 @@ import os
 
 #-----------------------------------------------------------
 #setup chatGPT
-openai.api_key = "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" # os.environ["OPENAI_API_KEY"]
+openai.api_key = "asdfgf" # os.environ["OPENAI_API_KEY"] 
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
