@@ -93,19 +93,19 @@ def send_english_text_to_opanai(text):
 # Send english text to speaker
 #-----------------------------------------------------------
 def say_english_text(text):
-    english_engine.setProperty('voice', english_voice_id)
+    voice_engine.setProperty('voice', english_voice_id)
     # send translation to speaker
-    english_engine.say(text)
-    english_engine.runAndWait()
+    voice_engine.say(text)
+    voice_engine.runAndWait()
     
 #-----------------------------------------------------------
 # Send Tamil text to speaker
 #-----------------------------------------------------------
 def say_tamil_text(text):
-    tamil_engine.setProperty('voice', tamil_voice_id)
+    voice_engine.setProperty('voice', tamil_voice_id)
     # send translation to speaker
-    tamil_engine.say(text)
-    tamil_engine.runAndWait()
+    voice_engine.say(text)
+    voice_engine.runAndWait()
 
 
 #-----------------------------------------------------------
