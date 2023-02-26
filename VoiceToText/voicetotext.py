@@ -1,49 +1,63 @@
-import speech_recognition as sr
+import speech_recognition as speech_recog
 from googletrans import Translator
 import pyttsx3
 import openai
 import os
+import time
 
-#-----------------------------------------------------------
-#setup chatGPT
-openai.api_key = os.environ["OPENAI_API_KEY"] 
-#-----------------------------------------------------------
+initialized = 0
 
-#-----------------------------------------------------------
-# setup voice engine for speaker
-#-----------------------------------------------------------
-voice_engine = pyttsx3.init()
-for voice in voice_engine.getProperty('voices'):
-  if 'English' in voice.name:
-    english_voice_id = voice.id
-  elif 'Tamil' in voice.name:
-    tamil_voice_id = voice.id
-  
-voice_engine.setProperty('rate', 150)
+def setup():
+    global voice_engine
+    global english_voice_id
+    global tamil_voice_id
+    global translator
+    global sr
+    global initialized
 
-#-----------------------------------------------------------
-# create a translator object
-#-----------------------------------------------------------
-translator = Translator()
+    if (initialized == 0):
+        #-----------------------------------------------------------
+        #setup chatGPT
+        openai.api_key = os.environ["OPENAI_API_KEY"] 
+        #-----------------------------------------------------------
 
-#-----------------------------------------------------------
-# Initialize the speech recognizer (mic)
-#-----------------------------------------------------------
-r = sr.Recognizer()
+        #-----------------------------------------------------------
+        # setup voice engine for speaker
+        #-----------------------------------------------------------
+        voice_engine = pyttsx3.init()
+        for voice in voice_engine.getProperty('voices'):
+            if 'English' in voice.name:
+                english_voice_id = voice.id
+            elif 'Tamil' in voice.name:
+                tamil_voice_id = voice.id
+        
+        voice_engine.setProperty('rate', 150)
+
+        #-----------------------------------------------------------
+        # create a translator object
+        #-----------------------------------------------------------
+        translator  = Translator()
+
+        #-----------------------------------------------------------
+        # Initialize the speech recognizer (mic)
+        #-----------------------------------------------------------
+        sr = speech_recog.Recognizer()
+
+        initialized = 1
 
 #-----------------------------------------------------------
 # Get the speaker output (in Tamil)
 #-----------------------------------------------------------
 def get_tamil_voice(): 
     # Open the microphone and start recording
-    with sr.Microphone() as source:
+    with speech_recog.Microphone() as source:
         print("Speak something...")
-        audio = r.listen(source)
+        audio = sr.listen(source)
 
     # Use Google Speech Recognition to transcribe the audio
     try:
         # Recognize audio as Tamil
-        text = r.recognize_google(audio, language="ta-IN")
+        text = sr.recognize_google(audio, language="ta-IN")
         print("You said: ", text)
 
         return text
@@ -93,6 +107,9 @@ def send_english_text_to_opanai(text):
 # Send english text to speaker
 #-----------------------------------------------------------
 def say_english_text(text):
+    # global voice_engine
+    # voice_engine = pyttsx3.init()
+
     voice_engine.setProperty('voice', english_voice_id)
     # send translation to speaker
     voice_engine.say(text)
@@ -102,21 +119,28 @@ def say_english_text(text):
 # Send Tamil text to speaker
 #-----------------------------------------------------------
 def say_tamil_text(text):
+
     voice_engine.setProperty('voice', tamil_voice_id)
     # send translation to speaker
     voice_engine.say(text)
     voice_engine.runAndWait()
 
 
-#-----------------------------------------------------------
-# Call sequence. 1. Get tamil voice. 2. Convert to English
-# 3. Send english text to OpenAI. 4. Convert responce to Tamil
-#-----------------------------------------------------------
-tamil_input = get_tamil_voice() #1
-say_tamil_text(tamil_input)
-english_input = convert_tamil_to_english(tamil_input) #2
-say_english_text(english_input)
-english_output = send_english_text_to_opanai(english_input) #3
-say_english_text(english_output)
-tamil_output = convert_english_to_tamil(english_output) #4
-say_tamil_text(tamil_output)
+def runChat():
+    setup()
+
+    #-----------------------------------------------------------
+    # Call sequence. 1. Get tamil voice. 2. Convert to English
+    # 3. Send english text to OpenAI. 4. Convert responce to Tamil
+    #-----------------------------------------------------------
+    tamil_input = get_tamil_voice() #1
+    say_tamil_text(tamil_input)
+    english_input = convert_tamil_to_english(tamil_input) #2
+    say_english_text(english_input)
+    english_output = send_english_text_to_opanai(english_input) #3
+    say_english_text(english_output)
+    tamil_output = convert_english_to_tamil(english_output) #4
+    say_tamil_text(tamil_output)
+
+while (True):
+  runChat()
