@@ -3,7 +3,7 @@ from googletrans import Translator
 import pyttsx3
 import openai
 import os
-import time
+import importlib
 
 initialized = 0
 
@@ -107,10 +107,15 @@ def send_english_text_to_opanai(text):
 # Send english text to speaker
 #-----------------------------------------------------------
 def say_english_text(text):
-    # global voice_engine
-    # voice_engine = pyttsx3.init()
 
+    # This statement to import pyttsx3 is a hack. For some reason
+    # the code gets hung on runAndWait after a few times. The hack is based 
+    # on https://github.com/nateshmbhat/pyttsx3/issues/126
+    importlib.reload(pyttsx3)
+    voice_engine = pyttsx3.init()
     voice_engine.setProperty('voice', english_voice_id)
+    voice_engine.setProperty('rate', 150)
+
     # send translation to speaker
     voice_engine.say(text)
     voice_engine.runAndWait()
@@ -119,8 +124,15 @@ def say_english_text(text):
 # Send Tamil text to speaker
 #-----------------------------------------------------------
 def say_tamil_text(text):
+    # This statement to import pyttsx3 is a hack. For some reason
+    # the code gets hung on runAndWait after a few times. The hack is based 
+    # on https://github.com/nateshmbhat/pyttsx3/issues/126
+    importlib.reload(pyttsx3)
+    voice_engine = pyttsx3.init()
 
     voice_engine.setProperty('voice', tamil_voice_id)
+    voice_engine.setProperty('rate', 150)
+
     # send translation to speaker
     voice_engine.say(text)
     voice_engine.runAndWait()
@@ -142,5 +154,5 @@ def runChat():
     tamil_output = convert_english_to_tamil(english_output) #4
     say_tamil_text(tamil_output)
 
-while (True):
-  runChat()
+# while (True):
+#  runChat()
